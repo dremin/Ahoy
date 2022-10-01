@@ -35,7 +35,7 @@ class VoiceOrchestrator: NSObject {
         super.init()
         
         let callKitConfig = CXProviderConfiguration()
-        callKitConfig.maximumCallGroups = 1
+        callKitConfig.maximumCallGroups = 2 // This class supports multiple calls OK, but the UI doesn't yet. System UI can be used to manage multiple calls.
         callKitConfig.maximumCallsPerCallGroup = 1
         callKitConfig.supportedHandleTypes = [ .phoneNumber, .generic ]
         
@@ -321,6 +321,20 @@ extension VoiceOrchestrator: CXProviderDelegate {
         
         call.isMuted = action.isMuted
         callUpdated?(call)
+        
+        action.fulfill()
+    }
+    
+    func provider(_ provider: CXProvider, perform action: CXPlayDTMFCallAction) {
+        logger.debug("provider:performPlayDTMFAction:")
+        
+        guard let call = activeCalls[action.callUUID.uuidString] else {
+            logger.error("Unknown UUID to perform PlayDTMFCallAction with")
+            action.fail()
+            return
+        }
+        
+        call.sendDigits(action.digits)
         
         action.fulfill()
     }

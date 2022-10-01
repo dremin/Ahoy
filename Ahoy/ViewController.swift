@@ -113,6 +113,7 @@ class ViewController: UIViewController {
     func updateUI(call: Call) {
         activeCall = call
         
+        // TODO: When we place a call, to and from are nil. Need to store the dialed number and retrieve for display.
         activeCallTitle.text = voiceOrchestrator?.formatNumber(remote: call.from ?? call.to)
         
         if call.isOnHold {
@@ -136,6 +137,7 @@ class ViewController: UIViewController {
     
     func callAdded(call: Call) {
         DispatchQueue.main.async { [weak self] in
+            self?.placeCallInput.resignFirstResponder()
             self?.activeCallStack.isHidden = false
             self?.placeCallStack.isHidden = true
             self?.updateUI(call: call)
