@@ -334,7 +334,7 @@ extension VoiceOrchestrator: CXProviderDelegate {
             return
         }
         
-        call.sendDigits(action.digits)
+        call.sendDigits("\(action.digits)w")
         
         action.fulfill()
     }
