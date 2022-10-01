@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Intents
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -17,6 +18,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let _ = (scene as? UIWindowScene) else { return }
+        
+        // If the user attempts to place an Ahoy call from call history and the app was terminated, the user activity is provided here instead.
+        if let userActivity = connectionOptions.userActivities.first {
+            startCall(from: userActivity)
+        }
+    }
+    
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        // The user attempted to place an Ahoy call from call history while the app is running
+        startCall(from: userActivity)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -47,6 +58,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
-
+    // MARK: Helper functions
+    
+    func startCall(from userActivity: NSUserActivity) {
+        if let callIntent = userActivity.interaction?.intent as? INStartAudioCallIntent,
+           let contact = callIntent.contacts?[0] {
+            guard let handle = contact.personHandle?.value else { return }
+            
+            // Start a new call with CallKit
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.voiceOrchestrator?.placeCall(to: handle)
+        }
+    }
 }
 

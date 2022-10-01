@@ -1,24 +1,145 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13122.16" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina6_0" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13104.12"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Ahoy" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" xcode11CocoaTouchSystemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="l3j-A8-yGg">
+                                <rect key="frame" x="50" y="367" width="290" height="110.33333333333331"/>
+                                <subviews>
+                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter a number to dial" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="BoH-FD-S0o">
+                                        <rect key="frame" x="0.0" y="0.0" width="290" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="Cm1-eW-t3l"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                                        <textInputTraits key="textInputTraits" keyboardType="phonePad" textContentType="tel"/>
+                                    </textField>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AvJ-fG-FWV">
+                                        <rect key="frame" x="119.99999999999999" y="60" width="50.333333333333329" height="50.333333333333343"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled" image="phone.fill" catalog="system" cornerStyle="capsule" buttonSize="large">
+                                            <color key="baseBackgroundColor" systemColor="systemGreenColor"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="placeCallButtonClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="fbI-ed-Q5e"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="BoH-FD-S0o" secondAttribute="trailing" id="Vwd-d1-F1y"/>
+                                    <constraint firstItem="BoH-FD-S0o" firstAttribute="leading" secondItem="l3j-A8-yGg" secondAttribute="leading" id="mqY-8w-uAZ"/>
+                                </constraints>
+                            </stackView>
+                            <stackView hidden="YES" opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="nsY-3m-RlT">
+                                <rect key="frame" x="0.0" y="331.33333333333331" width="390" height="181.66666666666669"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Unknown" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DoU-ZF-LKX">
+                                        <rect key="frame" x="20" y="0.0" width="350" height="33.666666666666664"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="1XZ-xD-BeQ">
+                                        <rect key="frame" x="57.666666666666657" y="53.666666666666686" width="275" height="57.666666666666657"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rpd-6C-yQw">
+                                                <rect key="frame" x="0.0" y="0.0" width="86.333333333333329" height="57.666666666666664"/>
+                                                <buttonConfiguration key="configuration" style="tinted" image="mic.slash.fill" catalog="system" imagePlacement="top" title="Mute" imagePadding="3"/>
+                                                <connections>
+                                                    <action selector="muteButtonClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ehG-Jt-KRF"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="O1a-3T-GKo">
+                                                <rect key="frame" x="94.333333333333343" y="0.0" width="86.333333333333343" height="57.666666666666664"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="tinted" image="speaker.slash.fill" catalog="system" imagePlacement="top" title="Hold" imagePadding="3"/>
+                                                <connections>
+                                                    <action selector="holdButtonClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="PDY-ex-aUe"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JYb-W7-Ho7">
+                                                <rect key="frame" x="188.66666666666669" y="0.0" width="86.333333333333314" height="57.666666666666664"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="tinted" image="speaker.wave.3.fill" catalog="system" imagePlacement="top" title="Speaker" imagePadding="3"/>
+                                                <connections>
+                                                    <action selector="speakerButtonClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="xK6-7j-bni"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" role="destructive" translatesAutoresizingMaskIntoConstraints="NO" id="7c4-cl-P4v">
+                                        <rect key="frame" x="170" y="131.33333333333337" width="50.333333333333343" height="50.333333333333343"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled" image="phone.down.fill" catalog="system" cornerStyle="capsule" buttonSize="large">
+                                            <color key="baseBackgroundColor" systemColor="systemRedColor"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="endCallButtonClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="UJH-mz-xTk"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="DoU-ZF-LKX" firstAttribute="leading" secondItem="nsY-3m-RlT" secondAttribute="leading" constant="20" id="OtR-dN-Z8X"/>
+                                    <constraint firstAttribute="trailing" secondItem="DoU-ZF-LKX" secondAttribute="trailing" constant="20" id="XzM-Xv-9bM"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="l3j-A8-yGg" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="50" id="0wb-h8-29y"/>
+                            <constraint firstItem="l3j-A8-yGg" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="4Xd-fn-hOA"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="l3j-A8-yGg" secondAttribute="trailing" constant="50" id="DZK-yV-gZG"/>
+                            <constraint firstItem="nsY-3m-RlT" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Ial-GY-Ka6"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="nsY-3m-RlT" secondAttribute="trailing" id="Nf6-je-PCu"/>
+                            <constraint firstItem="nsY-3m-RlT" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="jpF-xH-X2b"/>
+                            <constraint firstItem="nsY-3m-RlT" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="qfU-02-oxN"/>
+                            <constraint firstItem="l3j-A8-yGg" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="uMV-bS-cyU"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="activeCallStack" destination="nsY-3m-RlT" id="7x5-MT-thk"/>
+                        <outlet property="activeCallTitle" destination="DoU-ZF-LKX" id="Oqt-dg-dBk"/>
+                        <outlet property="endCallButton" destination="7c4-cl-P4v" id="NKl-lx-qpv"/>
+                        <outlet property="holdButton" destination="O1a-3T-GKo" id="xu7-C2-qvz"/>
+                        <outlet property="muteButton" destination="rpd-6C-yQw" id="teb-mz-jEm"/>
+                        <outlet property="placeCallInput" destination="BoH-FD-S0o" id="YVD-a5-HM8"/>
+                        <outlet property="placeCallStack" destination="l3j-A8-yGg" id="iPN-jj-Ps1"/>
+                        <outlet property="speakerButton" destination="JYb-W7-Ho7" id="AOK-Cc-Mmf"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="140" y="4"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="mic.slash.fill" catalog="system" width="108" height="128"/>
+        <image name="phone.down.fill" catalog="system" width="128" height="55"/>
+        <image name="phone.fill" catalog="system" width="128" height="114"/>
+        <image name="speaker.slash.fill" catalog="system" width="118" height="128"/>
+        <image name="speaker.wave.3.fill" catalog="system" width="128" height="84"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGreenColor">
+            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemRedColor">
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
 </document>
