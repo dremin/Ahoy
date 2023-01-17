@@ -15,6 +15,7 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var activeCallStack: UIStackView!
     @IBOutlet weak var activeCallTitle: UILabel!
+    @IBOutlet weak var activeCallStatus: UILabel!
     @IBOutlet weak var muteButton: UIButton!
     @IBOutlet weak var holdButton: UIButton!
     @IBOutlet weak var speakerButton: UIButton!
@@ -110,13 +111,32 @@ class ViewController: UIViewController {
         voiceOrchestrator?.placeCall(to: to)
     }
     
-    func updateUI(call: Call) {
-        activeCall = call
+    func updateUI(call: AhoyCall) {
+        activeCall = call.call
         
-        // TODO: When we place a call, to and from are nil. Need to store the dialed number and retrieve for display.
-        activeCallTitle.text = voiceOrchestrator?.formatNumber(remote: call.from ?? call.to)
+        var callTitle: String?
+        let callStatus = call.status
         
-        if call.isOnHold {
+        if call.isOutbound {
+            callTitle = call.outboundAddress
+        } else {
+            callTitle = call.call.from ?? call.call.to
+        }
+        
+        activeCallTitle.text = voiceOrchestrator?.formatNumber(remote: callTitle)
+        
+        switch callStatus {
+        case .connecting:
+            activeCallStatus.text = "connecting..."
+        case .ringing:
+            activeCallStatus.text = "ringing..."
+        case .connected:
+            activeCallStatus.text = "connected"
+        case .disconnecting:
+            activeCallStatus.text = "disconnecting..."
+        }
+        
+        if call.call.isOnHold {
             holdButton.setTitle("Unhold", for: .normal)
             holdButton.setImage(UIImage(systemName: "speaker.fill"), for: .normal)
         } else {
@@ -124,7 +144,7 @@ class ViewController: UIViewController {
             holdButton.setImage(UIImage(systemName: "speaker.slash.fill"), for: .normal)
         }
         
-        if call.isMuted {
+        if call.call.isMuted {
             muteButton.setTitle("Unmute", for: .normal)
             muteButton.setImage(UIImage(systemName: "mic.fill"), for: .normal)
         } else {
@@ -135,7 +155,7 @@ class ViewController: UIViewController {
     
     // MARK: VoiceOrchestrator callbacks
     
-    func callAdded(call: Call) {
+    func callAdded(call: AhoyCall) {
         DispatchQueue.main.async { [weak self] in
             self?.placeCallInput.resignFirstResponder()
             self?.activeCallStack.isHidden = false
@@ -163,7 +183,7 @@ class ViewController: UIViewController {
         }
     }
     
-    func callUpdated(call: Call) {
+    func callUpdated(call: AhoyCall) {
         DispatchQueue.main.async { [weak self] in
             self?.updateUI(call: call)
         }

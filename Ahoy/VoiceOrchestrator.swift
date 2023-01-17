@@ -22,14 +22,13 @@ class VoiceOrchestrator: NSObject {
     // TwilioVoice properties
     var audioDevice = DefaultAudioDevice()
     var activeCallInvites: [String: CallInvite]! = [:]
-    var activeCalls: [String: Call]! = [:]
-    var userDisconnectedCalls: [String] = []
+    var activeCalls: [String: AhoyCall] = [:]
     var isSpeakerOutput = false
     
     // Callback functions
-    var callAdded: ((Call) -> Void)? = nil
+    var callAdded: ((AhoyCall) -> Void)? = nil
     var callRemoved: ((Call) -> Void)? = nil
-    var callUpdated: ((Call) -> Void)? = nil
+    var callUpdated: ((AhoyCall) -> Void)? = nil
     
     override init() {
         super.init()
@@ -92,15 +91,15 @@ class VoiceOrchestrator: NSObject {
     
     func endCall(uuid: UUID) {
         // User-initiated disconnect
-        userDisconnectedCalls.append(uuid.uuidString)
+        if var call = activeCalls[uuid.uuidString] {
+            call.isUserDisconnected = true
+            activeCalls[uuid.uuidString] = call
+        }
         
         // Tell CallKit that this call is ending. This will then call provider:performEndCallAction:
         // where we will actually end the call.
         
-        let action = CXEndCallAction(call: uuid)
-        let transaction = CXTransaction(action: action)
-        
-        callKitCallController.request(transaction) { error in
+        callKitCallController.requestTransaction(with: CXEndCallAction(call: uuid)) { error in
             if let error = error {
                 self.logger.error("EndCallAction transaction request failed: \(error.localizedDescription).")
             } else {
@@ -113,10 +112,7 @@ class VoiceOrchestrator: NSObject {
         // Tell CallKit that this call is changing hold state. This will then call provider:performSetHeldCallAction:
         // where we will actually hold/unhold the call.
         
-        let action = CXSetHeldCallAction(call: uuid, onHold: hold)
-        let transaction = CXTransaction(action: action)
-        
-        callKitCallController.request(transaction) { error in
+        callKitCallController.requestTransaction(with: CXSetHeldCallAction(call: uuid, onHold: hold)) { error in
             if let error = error {
                 self.logger.error("SetHeldCallAction transaction request failed: \(error.localizedDescription).")
             } else {
@@ -129,10 +125,7 @@ class VoiceOrchestrator: NSObject {
         // Tell CallKit that this call is changing mute state. This will then call provider:performSetMutedCallAction:
         // where we will actually mute/unmute the call.
         
-        let action = CXSetMutedCallAction(call: uuid, muted: mute)
-        let transaction = CXTransaction(action: action)
-        
-        callKitCallController.request(transaction) { error in
+        callKitCallController.requestTransaction(with: CXSetMutedCallAction(call: uuid, muted: mute)) { error in
             if let error = error {
                 self.logger.error("SetMutedCallAction transaction request failed: \(error.localizedDescription).")
             } else {
@@ -153,10 +146,8 @@ class VoiceOrchestrator: NSObject {
         
         let callHandle = createHandle(remote: sanitized, format: false)
         let uuid = UUID()
-        let startCallAction = CXStartCallAction(call: uuid, handle: callHandle)
-        let transaction = CXTransaction(action: startCallAction)
         
-        callKitCallController.request(transaction) { error in
+        callKitCallController.requestTransaction(with: CXStartCallAction(call: uuid, handle: callHandle)) { error in
             if let error = error {
                 self.logger.error("StartCallAction transaction request failed: \(error.localizedDescription)")
                 return
@@ -232,8 +223,9 @@ extension VoiceOrchestrator: CXProviderDelegate {
         let call = TwilioVoiceSDK.connect(options: connectOptions, delegate: self)
         
         // Update state
-        activeCalls[call.uuid!.uuidString] = call
-        callAdded?(call)
+        let activeCall = AhoyCall(call: call, isOutbound: true, outboundAddress: action.handle.value)
+        activeCalls[call.uuid!.uuidString] = activeCall
+        callAdded?(activeCall)
         
         callKitCompletionCallback = { success in
             if success {
@@ -268,13 +260,22 @@ extension VoiceOrchestrator: CXProviderDelegate {
         let call = callInvite.accept(options: acceptOptions, delegate: self)
         
         // Update our state
-        activeCalls[call.uuid!.uuidString] = call
+        let activeCall = AhoyCall(call: call)
+        activeCalls[call.uuid!.uuidString] = activeCall
         activeCallInvites.removeValue(forKey: callInvite.uuid.uuidString)
-        callAdded?(call)
+        callAdded?(activeCall)
         
-        logger.debug("Accepted call SID \(call.sid)")
-        
-        action.fulfill()
+        callKitCompletionCallback = { success in
+            if success {
+                self.logger.debug("Accepted call SID \(call.sid)")
+                action.fulfill()
+            } else {
+                self.logger.error("Unable to accept call")
+                action.fail()
+            }
+            
+            self.callKitCompletionCallback = nil
+        }
     }
 
     func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
@@ -283,10 +284,16 @@ extension VoiceOrchestrator: CXProviderDelegate {
         if let invite = activeCallInvites[action.callUUID.uuidString] {
             // Call was not yet answered; reject the invite
             invite.reject()
+            
+            // Remove the call from cache
             activeCallInvites.removeValue(forKey: action.callUUID.uuidString)
-        } else if let call = activeCalls[action.callUUID.uuidString] {
+        } else if var call = activeCalls[action.callUUID.uuidString] {
             // Disconnect the call
-            call.disconnect()
+            call.call.disconnect()
+            // Update status
+            call.status = .disconnecting
+            activeCalls[action.callUUID.uuidString] = call
+            callUpdated?(call)
         } else {
             logger.error("Unknown UUID to perform EndCallAction with")
             // Even though we failed, don't return an error--let the system know there's no call
@@ -304,7 +311,7 @@ extension VoiceOrchestrator: CXProviderDelegate {
             return
         }
         
-        call.isOnHold = action.isOnHold
+        call.call.isOnHold = action.isOnHold
         callUpdated?(call)
         
         action.fulfill()
@@ -319,7 +326,7 @@ extension VoiceOrchestrator: CXProviderDelegate {
             return
         }
         
-        call.isMuted = action.isMuted
+        call.call.isMuted = action.isMuted
         callUpdated?(call)
         
         action.fulfill()
@@ -334,7 +341,7 @@ extension VoiceOrchestrator: CXProviderDelegate {
             return
         }
         
-        call.sendDigits("\(action.digits)w")
+        call.call.sendDigits("\(action.digits)w")
         
         action.fulfill()
     }
@@ -379,7 +386,7 @@ extension VoiceOrchestrator: NotificationDelegate {
     }
     
     func cancelledCallInviteReceived(cancelledCallInvite: CancelledCallInvite, error: Error) {
-        logger.debug("cancelledCallInviteReceived, error: \(error.localizedDescription)")
+        logger.debug("cancelledCallInviteReceived, reason: \(error.localizedDescription)")
         // Once the SDK processes the push payload and determined it contains a cancelled CallInvite, this is called.
         
         // Find the CallInvite that matches this notification payload
@@ -388,11 +395,8 @@ extension VoiceOrchestrator: NotificationDelegate {
             return
         }
         
-        // Perform standard end call action
+        // Perform standard end call action, which will notify CallKit and remove the invite from cache
         endCall(uuid: callInvite.uuid)
-        
-        // Remove the call from cache
-        self.activeCallInvites.removeValue(forKey: callInvite.uuid.uuidString)
     }
 }
 
@@ -401,8 +405,24 @@ extension VoiceOrchestrator: CallDelegate {
     func callDidConnect(call: Call) {
         logger.debug("callDidConnect")
         
+        if var activeCall = activeCalls[call.uuid!.uuidString] {
+            activeCall.status = .connected
+            activeCalls[call.uuid!.uuidString] = activeCall
+            callUpdated?(activeCall)
+        }
+        
         if let callback = callKitCompletionCallback {
             callback(true)
+        }
+    }
+    
+    func callDidStartRinging(call: Call) {
+        logger.debug("callDidStartRinging")
+        
+        if var activeCall = activeCalls[call.uuid!.uuidString] {
+            activeCall.status = .ringing
+            activeCalls[call.uuid!.uuidString] = activeCall
+            callUpdated?(activeCall)
         }
     }
     
@@ -426,11 +446,14 @@ extension VoiceOrchestrator: CallDelegate {
     func callDidDisconnect(call: Call, error: Error?) {
         logger.debug("callDidDisconnect")
         
-        if let index = userDisconnectedCalls.firstIndex(of: call.uuid!.uuidString) {
-            // If the disconnect was user-initiated, CallKit is already aware
-            // Remove the user-disconnected state for this call now that we don't need it any more
-            userDisconnectedCalls.remove(at: index)
-        } else {
+        var isUserDisconnected = false
+        
+        if let activeCall = activeCalls[call.uuid!.uuidString] {
+            isUserDisconnected = activeCall.isUserDisconnected
+        }
+        
+        // If the disconnect was user-initiated, CallKit is already aware; tell it if not
+        if !isUserDisconnected {
             // Tell CallKit about the disconnect
             var reason = CXCallEndedReason.remoteEnded
             

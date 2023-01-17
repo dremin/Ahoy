@@ -11,9 +11,9 @@ import PushKit
 import UIKit
 import TwilioVoice
 
-// % twilio token:voice --identity=bob --voice-app-sid=APf160f7d9a0ae3c03e8b60b9699133ae0 --push-credential-sid=CRd4e0721b00e4c3f3e8c3a41f91f347ac --ttl 86400
+// % twilio token:voice --identity=bob --voice-app-sid=APxx --push-credential-sid=CRxx --ttl 86400
 
-let accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6InR3aWxpby1mcGE7dj0xIn0.eyJqdGkiOiJTS2YxNjJmYmFkMjYxNmI1ZGNiNmIyMzcxZGIwNWM0ZmMwLTE2NjQ1NzI4ODkiLCJncmFudHMiOnsiaWRlbnRpdHkiOiJib2IiLCJ2b2ljZSI6eyJpbmNvbWluZyI6eyJhbGxvdyI6dHJ1ZX0sIm91dGdvaW5nIjp7ImFwcGxpY2F0aW9uX3NpZCI6IkFQZjE2MGY3ZDlhMGFlM2MwM2U4YjYwYjk2OTkxMzNhZTAifSwicHVzaF9jcmVkZW50aWFsX3NpZCI6IkNSZDRlMDcyMWIwMGU0YzNmM2U4YzNhNDFmOTFmMzQ3YWMifX0sImlhdCI6MTY2NDU3Mjg4OSwiZXhwIjoxNjY0NjU5Mjg5LCJpc3MiOiJTS2YxNjJmYmFkMjYxNmI1ZGNiNmIyMzcxZGIwNWM0ZmMwIiwic3ViIjoiQUM1YjY3ZjI5YTEyMmZlM2U3MTg5YzIwZDRjMDY4ZDE2MSJ9.oxJ6SiuCGl2QIp7yW25IRRh7qd-8-CT5vWjsI2wm7gU"
+let accessToken = ""
 
 let kRegistrationTTLInDays = 365
 
